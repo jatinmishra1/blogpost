@@ -11,7 +11,27 @@ export const Home = () => {
   const { search } = useLocation()
   // const location = useLocation()
   //console.log(location)
-
+ async function findPostBySearch(query){
+  if(query===undefined){
+    const res = await axios.get("/posts" + search)
+    setPosts(res.data)
+  }else{
+    const res = await axios.get("/posts" + search)
+    if(res){
+      
+      let searched_posts=[]
+      for(let i=0;i<res.data.length;i++){
+        if(res?.data[i]?.title.includes(query)){
+          searched_posts.push(res.data[i])
+        }
+      }
+      setPosts(searched_posts)
+    }
+  }
+ 
+  
+ 
+}
   useEffect(() => {
     const fetchPost = async () => {
       const res = await axios.get("/posts" + search)
@@ -22,7 +42,7 @@ export const Home = () => {
   return (
     <>
       <Category />
-      <Card posts={posts} />
+      <Card posts={posts} findPostBySearch={findPostBySearch} />
     </>
   )
 }

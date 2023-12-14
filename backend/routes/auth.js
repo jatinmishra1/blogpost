@@ -1,6 +1,7 @@
 const router = require("express").Router()
 const User = require("../model/User")
 const bcrypt = require("bcrypt")
+const jwt=require("jsonwebtoken")
 
 // regsiter
 router.post("/register", async (req, res) => {
@@ -29,10 +30,16 @@ router.post("/login", async (req, res) => {
     //if no user
     !user && res.status(400).json("Wrong Credntials!")
 
+   
+
     //if same user then compare password
     const validate = await bcrypt.compare(req.body.password, user.password)
     //if not validate
     !validate && res.status(400).json("Wrong Credentials!")
+    console.log("token started generating")
+    const token=await user.generateAuthToken()
+    console.log(token)
+    res.cookie("jwtoken",token,{expires:new Date(Date.now()+50000000),httpOnly:true})
 
     const { password, ...other } = user._doc
     res.status(200).json(other)
